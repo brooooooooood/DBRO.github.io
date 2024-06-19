@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>D.BRO WEB BOT</title>
+    <link rel="icon" href="https://up6.cc/2024/06/171880659441131.jpg">
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@2.1.1/dist/tesseract.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-image: url('https://up6.cc/2024/06/171880659441131.jpg');
+            background-size: cover;
+            background-position: center;
+            color: #fff;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: rgba(0, 0, 0, 0.7);
+            border-radius: 10px;
+        }
+        /* Styles for English text */
+        .english {
+            font-family: 'Arial', sans-serif;
+            direction: ltr;
+        }
+        /* Styles for Arabic text */
+        .arabic {
+            font-family: 'Cairo', sans-serif;
+            direction: rtl;
+        }
+        /* Responsive styles */
+        @media (max-width: 767px) {
+            .container {
+                max-width: 90%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="username" class="english">Username:</label>
+                    <label for="username" class="arabic">اسم المستخدم:</label>
+                    <input type="text" id="username" class="form-control">
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="password" class="english">Password:</label>
+                    <label for="password" class="arabic">كلمة المرور:</label>
+                    <input type="password" id="password" class="form-control">
+                </div>
+            </div>
+            <div class="col-md-12 mt-2">
+                <button id="loginButton" class="btn btn-primary">
+                    <span class="english">Login</span>
+                    <span class="arabic">تسجيل الدخول</span>
+                </button>
+            </div>
+        </div>
+        
+        <div id="status" class="mb-3"></div>
+        
+        <div class="row mb-3">
+            <div class="col-md-8">
+                <div class="form-group">
+                    <label for="room" class="english">Room:</label>
+                    <label for="room" class="arabic">الغرفة:</label>
+                    <input type="text" id="room" class="form-control">
+                </div>
+            </div>
+            <div class="col-md-4">
+                <button id="joinRoomButton" class="btn btn-success mr-2">
+                    <span class="english">Join Room</span>
+                    <span class="arabic">الانضمام للغرفة</span>
+                </button>
+                <button id="leaveRoomButton" class="btn btn-danger">
+                    <span class="english">Leave Room</span>
+                    <span class="arabic">مغادرة الغرفة</span>
+                </button>
+            </div>
+            <div class="col-md-12 mt-2">
+                <select id="roomListbox" class="form-control"></select>
+            </div>
+            <div id="count" class="mt-2"></div>
+        </div>
+        
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <input type="text" id="master" class="form-control" placeholder="Type your master username here...">
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-check">
+                    <input type="checkbox" id="welcomeCheckbox" class="form-check-input">
+                    <label for="welcomeCheckbox" class="form-check-label english">Send Welcome Messages</label>
+                    <label for="welcomeCheckbox" class="form-check-label arabic">إرسال رسائل ترحيبية</label>
+                </div>
+                <div class="form-check">
+                    <input type="checkbox" id="spinCheckbox" class="form-check-input">
+                    <label for="spinCheckbox" class="form-check-label english">Spin</label>
+                    <label for="spinCheckbox" class="form-check-label arabic">دوران</label>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row mb-3">
+            <div class="col-md-12">
+                <div class="form-check">
+                    <input type="checkbox" id="activateQuizCheckbox" class="form-check-input">
+                    <label for="activateQuizCheckbox" class="form-check-label english">Activate Quiz</label>
+                    <label for="activateQuizCheckbox" class="form-check-label arabic">تفعيل الاختبار</label>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row">
+            <div class="col-md-8">
+                <div id="chatbox" class="bg-light p-3 mb-3" style="height: 300px; overflow-y: auto;"></div>
+                <div class="form-group">
+                    <input type="text" id="message" class="form-control" placeholder="Type your message here...">
+                </div>
+                <button id="sendMessageButton" class="btn btn-primary mt-2">
+                    <span class="english">Send Message</span>
+                    <span class="arabic">إرسال الرسالة</span>
+                </button>
+            </div>
+            <div class="col-md-4">
+                <div class="bg-light p-3 mb-3" style="height: 300px; overflow-y: auto;">
+                    <label for="userListbox" class="english">Current Users:</label>
+                    <label for="userListbox" class="arabic">المستخدمون الحاليون:</label>
+                    <select id="userListbox" class="form-control" size="10" multiple></select>
+                </div>
+                <ul id="roomlistbox" class="list-group"></ul>
+            </div>
+        </div>
+        
+        <div class="row mt-3">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <input type="text" id="target" class="form-control" placeholder="Type your target username here...">
+                </div>
+            </div>
+            <div class="col-md-6">
+                <button id="banButton" class="btn btn-danger mr-2">
+                    <span class="english">Ban</span>
+                    <span class="arabic">حظر</span>
+                </button>
+                <button id="kickButton" class="btn btn-warning mr-2">
+                    <span class="english">Kick</span>
+                    <span class="arabic">طرد</span>
+                </button>
+                <button id="memButton" class="btn btn-secondary mr-2">
+                    <span class="english">Member</span>
+                    <span class="arabic">عضو</span>
+                </button>
+                <button id="adminButton" class="btn btn-info mr-2">
+                    <span class="english">Admin</span>
+                    <span class="arabic">مشرف</span>
+                </button>
+                <button id="ownerButton" class="btn btn-primary mr-2">
+                    <span class="english">Owner</span>
+                    <span class="arabic">مالك</span>
+                </button>
+                <button id="noneButton" class="btn btn-secondary">
+                    <span class="english">None</span>
+                    <span class="arabic">لا شيء</span>
+                </button>
+            </div>
+        </div>
+        
+        <div id="emojiList" class="my-3">
+            <!-- Smileys & People -->
+            <span class="emoji-item">😀</span>
+        <span class="emoji-item">😁</span>
+        <span class="emoji-item">😂</span>
+        <span class="emoji-item">🤣</span>
+        <span class="emoji-item">😃</span>
+        <span class="emoji-item">😄</span>
+        <span class="emoji-item">😅</span>
+        <span class="emoji-item">😆</span>
+        <span class="emoji-item">😉</span>
+        <span class="emoji-item">😊</span>
+        <span class="emoji-item">😋</span>
+        <span class="emoji-item">😎</span>
+        <span class="emoji-item">😍</span>
+        <span class="emoji-item">😘</span>
+        <span class="emoji-item">😗</span>
+        <span class="emoji-item">😙</span>
+        <span class="emoji-item">😚</span>
+        <span class="emoji-item">🙂</span>
+        <span class="emoji-item">🤗</span>
+        <span class="emoji-item">🤔</span>
+        <span class="emoji-item">😐</span>
+        <span class="emoji-item">😑</span>
+        <span class="emoji-item">😶</span>
+        <span class="emoji-item">🙄</span>
+        <span class="emoji-item">😏</span>
+        <span class="emoji-item">😣</span>
+        <span class="emoji-item">😥</span>
+        <span class="emoji-item">😮</span>
+        <span class="emoji-item">🤐</span>
+        <span class="emoji-item">😯</span>
+        <span class="emoji-item">😪</span>
+        <span class="emoji-item">😫</span>
+        <span class="emoji-item">😴</span>
+        <span class="emoji-item">😌</span>
+        <span class="emoji-item">😛</span>
+        <span class="emoji-item">😜</span>
+        <span class="emoji-item">😝</span>
+        <span class="emoji-item">🤤</span>
+        <span class="emoji-item">😒</span>
+        <span class="emoji-item">😓</span>
+        <span class="emoji-item">😔</span>
+        <span class="emoji-item">😕</span>
+        <span class="emoji-item">🙃</span>
+        <span class="emoji-item">🤑</span>
+        <span class="emoji-item">😲</span>
+        <span class="emoji-item">☹️</span>
+        <span class="emoji-item">🙁</span>
+        <span class="emoji-item">😖</span>
+        <span class="emoji-item">😞</span>
+        <span class="emoji-item">😟</span>
+        <span class="emoji-item">😤</span>
+        <span class="emoji-item">😢</span>
+        <span class="emoji-item">😭</span>
+        <span class="emoji-item">😦</span>
+        <span class="emoji-item">😧</span>
+        <span class="emoji-item">😨</span>
+        <span class="emoji-item">😩</span>
+        <span class="emoji-item">😬</span>
+        <span class="emoji-item">😰</span>
+        <span class="emoji-item">😱</span>
+        <span class="emoji-item">😳</span>
+        <span class="emoji-item">😵</span>
+        <span class="emoji-item">😡</span>
+        <span class="emoji-item">😠</span>
+        <span class="emoji-item">😷</span>
+        <span class="emoji-item">🤒</span>
+        <span class="emoji-item">🤕</span>
+        <span class="emoji-item">🤢</span>
+        <span class="emoji-item">🤧</span>
+        <span class="emoji-item">😇</span>
+        <span class="emoji-item">🤠</span>
+        <span class="emoji-item">🤡</span>
+        <span class="emoji-item">🤥</span>
+        <span class="emoji-item">🤓</span>
+        <span class="emoji-item">👿</span>
+        <span class="emoji-item">👹</span>
+        <span class="emoji-item">👺</span>
+        <span class="emoji-item">💀</span>
+        <span class="emoji-item">👻</span>
+        <span class="emoji-item">👽</span>
+        <span class="emoji-item">👾</span>
+        <span class="emoji-item">🤖</span>
+
+        <!-- Animals & Nature -->
+        <span class="emoji-item">🐶</span>
+        <span class="emoji-item">🐱</span>
+        <span class="emoji-item">🐭</span>
+        <span class="emoji-item">🐹</span>
+        <span class="emoji-item">🐰</span>
+        <span class="emoji-item">🦊</span>
+        <span class="emoji-item">🐻</span>
+        <span class="emoji-item">🐼</span>
+        <span class="emoji-item">🐨</span>
+        <span class="emoji-item">🐯</span>
+        <span class="emoji-item">🦁</span>
+        <span class="emoji-item">🐮</span>
+        <span class="emoji-item">🐷</span>
+        <span class="emoji-item">🐽</span>
+        <span class="emoji-item">🐸</span>
+        <span class="emoji-item">🐵</span>
+        <span class="emoji-item">🙈</span>
+        <span class="emoji-item">🙉</span>
+        <span class="emoji-item">🙊</span>
+        <span class="emoji-item">🐒</span>
+        <span class="emoji-item">🐔</span>
+        <span class="emoji-item">🐧</span>
+        <span class="emoji-item">🐦</span>
+        <span class="emoji-item">🐤</span>
+        <span class="emoji-item">🐣</span>
+        <span class="emoji-item">🐥</span>
+        <span class="emoji-item">🦆</span>
+        <span class="emoji-item">🦅</span>
+        <span class="emoji-item">🦉</span>
+        <span class="emoji-item">🦇</span>
+        <span class="emoji-item">🐺</span>
+        <span class="emoji-item">🐗</span>
+        <span class="emoji-item">🐴</span>
+        <span class="emoji-item">🦄</span>
+        <span class="emoji-item">🐝</span>
+        <span class="emoji-item">🐛</span>
+        <span class="emoji-item">🦋</span>
+        <span class="emoji-item">🐌</span>
+        <span class="emoji-item">🐞</span>
+        <span class="emoji-item">🐜</span>
+        <span class="emoji-item">🦟</span>
+        <span class="emoji-item">🦗</span>
+        <span class="emoji-item">🕷️</span>
+        <span class="emoji-item">🕸️</span>
+        <span class="emoji-item">🐢</span>
+        <span class="emoji-item">🐍</span>
+        <span class="emoji-item">🦎</span>
+        <span class="emoji-item">🦖</span>
+        <span class="emoji-item">🦕</span>
+        <span class="emoji-item">🐙</span>
+        <span class="emoji-item">🦑</span>
+        <span class="emoji-item">🦐</span>
+        <span class="emoji-item">🦞</span>
+        <span class="emoji-item">🦀</span>
+        <span class="emoji-item">🐡</span>
+        <span class="emoji-item">🐠</span>
+        <span class="emoji-item">🐟</span>
+        <span class="emoji-item">🐬</span>
+        <span class="emoji-item">🐳</span>
+        <span class="emoji-item">🐋</span>
+        <span class="emoji-item">🦈</span>
+        <span class="emoji-item">🐊</span>
+        <span class="emoji-item">🐅</span>
+        <span class="emoji-item">🐆</span>
+        <span class="emoji-item">🦓</span>
+        <span class="emoji-item">🦍</span>
+        <span class="emoji-item">🐘</span>
+        <span class="emoji-item">🦏</span>
+        <span class="emoji-item">🦛</span>
+        <span class="emoji-item">🐪</span>
+        <span class="emoji-item">🐫</span>
+        <span class="emoji-item">🦙</span>
+        <span class="emoji-item">🦒</span>
+        <span class="emoji-item">🐃</span>
+        <span class="emoji-item">🐂</span>
+        <span class="emoji-item">🐄</span>
+        <span class="emoji-item">🐎</span>
+        <span class="emoji-item">🐖</span>
+        <span class="emoji-item">🐏</span>
+        <span class="emoji-item">🐑</span>
+        <span class="emoji-item">🐐</span>
+        <span class="emoji-item">🦌</span>
+        <span class="emoji-item">🐕</span>
+        <span class="emoji-item">🐩</span>
+        <span class="emoji-item">🦮</span>
+        <span class="emoji-item">🐕‍🦺</span>
+        <span class="emoji-item">🐈</span>
+        <span class="emoji-item">🐈‍⬛</span>
+        <span class="emoji-item">🦢</span>
+        <span class="emoji-item">🐓</span>
+        <span class="emoji-item">🦃</span>
+        <span class="emoji-item">🦚</span>
+        <span class="emoji-item">🦜</span>
+        <span class="emoji-item">🦢</span>
+        <span class="emoji-item">🦩</span>
+        <span class="emoji-item">🦝</span>
+        <span class="emoji-item">🦨</span>
+        <span class="emoji-item">🦡</span>
+        <span class="emoji-item">🦦</span>
+        <span class="emoji-item">🦥</span>
+        <span class="emoji-item">🐁</span>
+        <span class="emoji-item">🐀</span>
+        <span class="emoji-item">🐿️</span>
+        <span class="emoji-item">🦔</span>
+        <span class="emoji-item">🌵</span>
+        <span class="emoji-item">🎄</span>
+        <span class="emoji-item">🌲</span>
+        <span class="emoji-item">🌳</span>
+        <span class="emoji-item">🌴</span>
+        <span class="emoji-item">🪵</span>
+        <span class="emoji-item">🌱</span>
+        <span class="emoji-item">🌿</span>
+        <span class="emoji-item">☘️</span>
+        <span class="emoji-item">🍀</span>
+        <span class="emoji-item">🎍</span>
+        <span class="emoji-item">🪴</span>
+        <span class="emoji-item">🎋</span>
+        <span class="emoji-item">🍃</span>
+        <span class="emoji-item">🍂</span>
+        <span class="emoji-item">🍁</span>
+        <span class="emoji-item">🍄</span>
+        <span class="emoji-item">🐚</span>
+        <span class="emoji-item">🪨</span>
+        <span class="emoji-item">🌾</span>
+        <span class="emoji-item">💐</span>
+        <span class="emoji-item">🌷</span>
+        <span class="emoji-item">🌹</span>
+        <span class="emoji-item">🥀</span>
+        <span class="emoji-item">🌺</span>
+        <span class="emoji-item">🌸</span>
+        <span class="emoji-item">🌼</span>
+        <span class="emoji-item">🌻</span>
+        <span class="emoji-item">🌞</span>
+        <span class="emoji-item">🌝</span>
+        <span class="emoji-item">🌛</span>
+        <span class="emoji-item">🌜</span>
+        <span class="emoji-item">🌚</span>
+        <span class="emoji-item">🌕</span>
+        <span class="emoji-item">🌖</span>
+        <span class="emoji-item">🌗</span>
+        <span class="emoji-item">🌘</span>
+        <span class="emoji-item">🌑</span>
+        <span class="emoji-item">🌒</span>
+        <span class="emoji-item">🌓</span>
+        <span class="emoji-item">🌔</span>
+        <span class="emoji-item">🌙</span>
+        <span class="emoji-item">🌎</span>
+        <span class="emoji-item">🌍</span>
+        <span class="emoji-item">🌏</span>
+        <span class="emoji-item">🪐</span>
+        <span class="emoji-item">💫</span>
+        <span class="emoji-item">⭐</span>
+        <span class="emoji-item">🌟</span>
+        <span class="emoji-item">✨</span>
+        <span class="emoji-item">⚡</span>
+        <span class="emoji-item">☄️</span>
+        <span class="emoji-item">💥</span>
+        <span class="emoji-item">🔥</span>
+        <span class="emoji-item">🌪️</span>
+        <span class="emoji-item">🌈</span>
+        <span class="emoji-item">☀️</span>
+        <span class="emoji-item">🌤️</span>
+        <span class="emoji-item">⛅</span>
+        <span class="emoji-item">🌥️</span>
+        <span class="emoji-item">☁️</span>
+        <span class="emoji-item">🌦️</span>
+        <span class="emoji-item">🌧️</span>
+        <span class="emoji-item">⛈️</span>
+        <span class="emoji-item">🌩️</span>
+        <span class="emoji-item">🌨️</span>
+        <span class="emoji-item">❄️</span>
+        <span class="emoji-item">☃️</span>
+        <span class="emoji-item">⛄</span>
+        <span class="emoji-item">🌬️</span>
+        <span class="emoji-item">💨</span>
+        <span class="emoji-item">💧</span>
+        <span class="emoji-item">💦</span>
+        <span class="emoji-item">☔</span>
+        <span class="emoji-item">☂️</span>
+        <span class="emoji-item">🌊</span>
+        <span class="emoji-item">🌫️</span>
+        <!-- Add more emojis as needed -->
+    </div>
+
+    <div>
+        <label for="debugBox">Debug Messages:</label>
+        <textarea id="debugBox" rows="10" cols="50" readonly></textarea>
+    </div>
+</div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
